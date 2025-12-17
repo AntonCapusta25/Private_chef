@@ -41,17 +41,17 @@ export default function Navbar() {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className={`fixed top-5 left-1/2 -translate-x-1/2 w-[92%] max-w-[1100px] z-50 rounded-full px-8 py-4 flex justify-between items-center transition-all duration-300 border border-white/20 ${scrolled
+            className={`fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-[1000px] z-50 rounded-full px-6 py-3 flex justify-between items-center transition-all duration-300 border border-white/20 ${scrolled
                 ? "bg-white/90 backdrop-blur-md shadow-lg"
                 : "bg-white/90 backdrop-blur-sm shadow-sm"
                 }`}
         >
             <Link href="/" className="flex items-center gap-2">
-                {/* Placeholder Logo or Text if image missing */}
-                <div className="relative w-32 h-12">
+                {/* Christmas Logo */}
+                <div className="relative w-28 h-10 md:w-32 md:h-12">
                     <img
-                        src="/images/logo-homemade.png"
-                        alt="HomeMade Logo"
+                        src="/images/logo-christmas.png"
+                        alt="HomeMade Christmas Logo"
                         className="object-contain w-full h-full"
                     />
                 </div>

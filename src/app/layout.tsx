@@ -15,8 +15,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Savor the Magic - Christmas Chef",
-  description: "Experience world-class dining in the warmth of your home.",
+  title: "HomeMade | Premium Christmas Private Dining & Chef Boxes",
+  description: "Experience world-class private dining in the warmth of your home. Order luxury Christmas dinner boxes or book a private chef for the holidays.",
 };
 
 export default function RootLayout({
