@@ -72,6 +72,17 @@ export default function Hero() {
 
             {/* Content */}
             <div className="relative z-10 text-center max-w-4xl px-5">
+                <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+                    className="inline-block mb-4 px-6 py-2 rounded-full border border-orange/50 bg-white/10 backdrop-blur-md shadow-lg"
+                >
+                    <span className="text-orange font-bold tracking-wide uppercase text-sm md:text-base">
+                        ✨ Customize your own menu or box
+                    </span>
+                </motion.div>
+
                 <motion.h1
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}

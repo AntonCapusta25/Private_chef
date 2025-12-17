@@ -41,14 +41,14 @@ export default function Navbar() {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className={`fixed top-5 left-1/2 -translate-x-1/2 w-[92%] max-w-[1100px] z-50 rounded-full px-8 py-4 flex justify-between items-center transition-all duration-300 border border-white/20 ${scrolled
+            className={`fixed top-4 left-1/2 -translate-x-1/2 w-[90%] max-w-[1000px] z-50 rounded-full px-6 py-2.5 flex justify-between items-center transition-all duration-300 border border-white/20 ${scrolled
                 ? "bg-white/90 backdrop-blur-md shadow-lg"
                 : "bg-white/90 backdrop-blur-sm shadow-sm"
                 }`}
         >
             <Link href="/" className="flex items-center gap-2">
                 {/* Logo */}
-                <div className="h-12 w-auto">
+                <div className="h-9 w-auto">
                     <img
                         src="/images/logo-new.png"
                         alt="HomeMade Logo"
@@ -72,7 +72,7 @@ export default function Navbar() {
             <Link
                 href={bookingLink}
                 target={bookingLink.startsWith('http') ? "_blank" : "_self"}
-                className="bg-orange hover:bg-orange/90 text-white px-6 py-3 rounded-full font-semibold text-sm uppercase tracking-wide shadow-md hover:-translate-y-0.5 transition-all duration-300"
+                className="bg-orange hover:bg-orange/90 text-white px-5 py-2 rounded-full font-semibold text-xs uppercase tracking-wide shadow-md hover:-translate-y-0.5 transition-all duration-300"
             >
                 Book Now
             </Link>
