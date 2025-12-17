@@ -50,7 +50,7 @@ export default function Navbar() {
                 {/* Logo */}
                 <div className="h-12 w-auto">
                     <img
-                        src="/images/logo-orange.png"
+                        src="/images/logo-new.png"
                         alt="HomeMade Logo"
                         className="h-full w-auto object-contain rounded-md"
                     />
