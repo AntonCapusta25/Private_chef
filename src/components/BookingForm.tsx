@@ -225,7 +225,7 @@ function BookingFormContent() {
                                             className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 pl-12 text-cream focus:outline-none focus:border-[#F27D42]/50 focus:bg-white/10 transition-all appearance-none cursor-pointer"
                                         >
                                             <option className="bg-[#2D2420]" value="">-- I'll Customize My Own --</option>
-                                            {menus.map(menu => (
+                                            {menus.filter(menu => !menu.soldOut).map(menu => (
                                                 <option key={menu.id} value={menu.id} className="bg-[#2D2420]">
                                                     {menu.title}
                                                 </option>
