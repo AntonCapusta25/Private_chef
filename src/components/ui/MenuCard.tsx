@@ -66,9 +66,24 @@ export default function MenuCard({ menu, index = 0, priority = false }: MenuCard
                 </span>
 
                 {!isSoldOut ? (
-                    <span className="text-orange font-semibold text-sm uppercase tracking-wide group-hover:underline decoration-2 underline-offset-4">
-                        View Details &rarr;
-                    </span>
+                    <div className="flex gap-3 items-center">
+                        {/* Detail Link (Hidden on click to avoid double nav if simplified, but kept for UX) */}
+                        <span className="text-xs font-medium text-light uppercase tracking-wide group-hover:text-dark transition-colors">
+                            Details
+                        </span>
+
+                        {/* Quick Book Button */}
+                        <a
+                            href={`#booking?menu=${encodeURIComponent(menu.title)}`}
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                // Optional: Smooth scroll manually if needed, but anchor tag works
+                            }}
+                            className="bg-orange text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full shadow-md hover:bg-dark transition-colors transform hover:-translate-y-0.5 active:translate-y-0"
+                        >
+                            Book
+                        </a>
+                    </div>
                 ) : (
                     <span className="text-gray-400 font-semibold text-xs uppercase tracking-wide">
                         Fully Booked
