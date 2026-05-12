@@ -69,7 +69,7 @@ export default function MenuCard({ menu, index = 0, priority = false }: MenuCard
 
             <div className="flex justify-between items-center border-t border-dark/10 pt-4 mt-auto">
                 <span className={`font-bold text-dark text-lg ${isSoldOut ? 'line-through text-gray-400' : ''}`}>
-                    {menu.price}
+                    €{menu.basePrice}
                 </span>
 
                 {!isSoldOut ? (
