@@ -85,7 +85,7 @@ export default function MenuDetailPage({ params }: { params: Promise<{ id: strin
                     href="/#booking"
                     className="block w-full bg-orange text-white text-center py-4 rounded-full font-bold shadow-xl uppercase tracking-widest"
                 >
-                    Reserve for {menu.price}
+                    Reserve for €{menu.basePrice}
                 </Link>
             </div>
         </main>
@@ -113,36 +113,21 @@ function MenuItemCard({ item, index }: { item: MenuItem; index: number }) {
                 <p className="text-light text-lg mb-8 leading-relaxed">
                     {item.description}
                 </p>
-
-                <div className={`space-y-4 ${!isEven ? 'md:items-end flex flex-col' : ''}`}>
-                    <h4 className="text-sm font-bold text-dark/40 uppercase tracking-widest">
-                        Key Ingredients
-                    </h4>
-                    <div className="flex flex-wrap gap-3">
-                        {item.ingredients.map((ing, i) => (
-                            <div
-                                key={i}
-                                className="group relative bg-white border border-dark/5 px-4 py-2 rounded-xl hover:border-orange/30 hover:shadow-lg hover:shadow-orange/5 transition-all cursor-default"
-                            >
-                                <span className="font-medium text-dark group-hover:text-orange transition-colors">
-                                    {ing.name}
-                                </span>
-                                {/* Tooltip */}
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-48 bg-dark text-white text-xs p-3 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-xl z-20">
-                                    {ing.description}
-                                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-8 border-transparent border-t-dark" />
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
             </div>
 
             {/* Visual Decoration */}
             <div className="flex-1 w-full md:w-auto relative aspect-square max-w-sm">
                 <div className="absolute inset-0 bg-gradient-to-br from-orange/20 to-transparent rounded-full blur-3xl opacity-30" />
                 <div className="relative w-full h-full bg-white rounded-3xl border border-white/50 shadow-2xl shadow-orange/10 flex items-center justify-center overflow-hidden">
-                    <span className="text-[10rem] opacity-5 font-heading text-dark select-none">
+                    <div className="relative w-full h-full">
+                        <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-cover opacity-20"
+                        />
+                    </div>
+                    <span className="absolute text-[10rem] opacity-5 font-heading text-dark select-none">
                         {index + 1}
                     </span>
                 </div>
