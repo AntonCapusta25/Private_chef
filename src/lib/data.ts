@@ -78,7 +78,6 @@ export const menus: Menu[] = [
         ]
     },
     {
-        slug: "ron-blaauw",
         id: "ron-gastrobar-athome",
         title: "Gastrobar at Home",
         chef: "Ron Blaauw",
@@ -107,7 +106,6 @@ export const menus: Menu[] = [
         ]
     },
     {
-        slug: "bergpaviljoen",
         id: "berg-bistronomique",
         title: "Bistronomique Feast",
         chef: "Bergpaviljoen",
