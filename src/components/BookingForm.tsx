@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { Calendar, Users, Utensils, ArrowRight, Star, Sparkles, ChefHat, BookOpen, CheckCircle2 } from "lucide-react";
 import { menus, chefs } from "@/lib/data";
 import confetti from "canvas-confetti";
@@ -237,7 +238,17 @@ function BookingFormContent() {
                                 {/* Chef & Cuisine (Auto-filled or Manual) */}
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-medium uppercase tracking-wider text-gray-500 ml-1">Preferred Chef</label>
+                                        <div className="flex justify-between items-center">
+                                            <label className="text-xs font-medium uppercase tracking-wider text-gray-500 ml-1">Preferred Chef</label>
+                                            {selectedChefName && chefs.find(c => c.name === selectedChefName) && (
+                                                <Link 
+                                                    href={`/chef/${chefs.find(c => c.name === selectedChefName)?.slug}`}
+                                                    className="text-[10px] text-orange hover:underline uppercase tracking-tighter"
+                                                >
+                                                    View Profile
+                                                </Link>
+                                            )}
+                                        </div>
                                         <div className="relative group">
                                             <ChefHat className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#F27D42] transition-colors" size={18} />
                                             {selectedMenuId ? (

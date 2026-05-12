@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Menu } from '@/lib/data';
+import { Menu, chefs } from '@/lib/data';
 
 interface MenuCardProps {
     menu: Menu;
@@ -12,6 +13,8 @@ interface MenuCardProps {
 
 export default function MenuCard({ menu, index = 0, priority = false }: MenuCardProps) {
     const isSoldOut = menu.soldOut;
+    const chef = chefs.find(c => c.name === menu.chef);
+    const chefLink = chef ? `/chef/${chef.slug}` : '#';
 
     return (
         <motion.div
@@ -56,9 +59,13 @@ export default function MenuCard({ menu, index = 0, priority = false }: MenuCard
             <h3 className={`text-2xl font-heading font-bold text-dark mb-1 transition-colors ${isSoldOut ? 'text-gray-500' : 'group-hover:text-orange'}`}>
                 {menu.title}
             </h3>
-            <p className="text-light text-sm font-medium uppercase tracking-wide mb-4">
+            <Link 
+                href={chefLink} 
+                className="text-light text-sm font-medium uppercase tracking-wide mb-4 hover:text-orange transition-colors inline-block z-10 relative"
+                onClick={(e) => e.stopPropagation()}
+            >
                 {menu.chef}
-            </p>
+            </Link>
 
             <div className="flex justify-between items-center border-t border-dark/10 pt-4 mt-auto">
                 <span className={`font-bold text-dark text-lg ${isSoldOut ? 'line-through text-gray-400' : ''}`}>

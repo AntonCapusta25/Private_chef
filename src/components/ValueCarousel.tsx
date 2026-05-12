@@ -12,7 +12,7 @@ import "swiper/css/pagination";
 import { doodleStories } from "@/lib/data";
 import StoryCard from "./ui/StoryCard";
 
-export default function ChefCarousel() {
+export default function ValueCarousel() {
     // Duplicate logic for smooth loop
     const carouselItems = [...doodleStories, ...doodleStories, ...doodleStories];
 

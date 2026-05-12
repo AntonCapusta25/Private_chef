@@ -2,7 +2,8 @@ import BookingForm from "@/components/BookingForm";
 import Hero from "@/components/Hero";
 import MenuGrid from "@/components/MenuGrid";
 import OccasionsCarousel from "@/components/OccasionsCarousel";
-import ChefCarousel from "@/components/ChefCarousel";
+import ChefShowcase from "@/components/ChefShowcase";
+import ValueCarousel from "@/components/ValueCarousel";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HowItWorks from "@/components/HowItWorks";
@@ -14,7 +15,8 @@ export default function Home() {
       <Navbar />
       <Hero />
       <MenuGrid />
-      <ChefCarousel />
+      <ChefShowcase />
+      <ValueCarousel />
       <OccasionsCarousel />
       <HowItWorks />
       <BookingForm />
