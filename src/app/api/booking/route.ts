@@ -75,8 +75,9 @@ export async function POST(request: NextRequest) {
         const COLORS = {
             cream: '#FDFBF7',
             dark: '#111111',
-            gold: '#D4AF37',
-            goldLight: '#F2D06B',
+            purple: '#8B2B8A',
+            gold: '#F2D06B',
+            goldLight: '#F5E1A4',
             orange: '#F27D42'
         };
 

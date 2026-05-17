@@ -10,12 +10,16 @@ export interface MenuItem {
     description: string;
     image: string;
     price: number;
+    dietary?: string[];
+    allergens?: string[];
 }
 
 export interface Extra {
     id: string;
     name: string;
     price: number;
+    image?: string;
+    description?: string;
 }
 
 export interface Menu {
@@ -28,6 +32,9 @@ export interface Menu {
     description: string;
     items: MenuItem[];
     extras?: Extra[];
+    desserts?: Extra[];
+    serviceExtras?: Extra[];
+    includes?: string[];
     soldOut?: boolean;
 }
 
@@ -43,7 +50,7 @@ export interface Occasion {
 export const menus: Menu[] = [
     {
         id: "hans-private",
-        title: "Signature Private Dining",
+        title: "Michelin Star Home Experience",
         chef: "Hans Van Wolde",
         basePrice: 185,
         image: "/images/menu-brut.png",
@@ -73,13 +80,17 @@ export const menus: Menu[] = [
             }
         ],
         extras: [
-            { id: "wine-pairing", name: "Grand Cru Wine Pairing", price: 120 },
-            { id: "caviar-service", name: "Premium Caviar Service", price: 150 }
+            { id: "wine-pairing", name: "Grand Cru Wine Pairing", price: 120, image: "/images/menu-brut.png" },
+            { id: "caviar-service", name: "Premium Caviar Service", price: 150, image: "/images/menu-classic.png" }
+        ],
+        serviceExtras: [
+            { id: "hans-serv-butler", name: "Private White-Glove Butler", price: 200, image: "/images/hero-bg.jpg" },
+            { id: "hans-serv-waiter", name: "Elite Waitstaff Service", price: 150, image: "/images/menu-classic.png" }
         ]
     },
     {
         id: "ron-gastrobar-athome",
-        title: "Gastrobar at Home",
+        title: "Urban Comfort Feast",
         chef: "Ron Blaauw",
         basePrice: 95,
         image: "/images/menu-ron.png",
@@ -102,12 +113,17 @@ export const menus: Menu[] = [
             }
         ],
         extras: [
-            { id: "cocktail-kit", name: "Gastrobar Cocktail Kit", price: 45 }
+            { id: "cocktail-kit", name: "Gastrobar Cocktail Kit", price: 45, image: "/images/menu-brut.png" },
+            { id: "ron-extra-fries", name: "Truffle Parmesan Fries", price: 12, image: "/images/menu-classic.png" }
+        ],
+        serviceExtras: [
+            { id: "ron-serv-dj", name: "Gastrobar DJ Set (2h)", price: 250, image: "/images/hero-bg.jpg" },
+            { id: "ron-serv-setup", name: "Industrial Style Table Setup", price: 85, image: "/images/menu-ron.png" }
         ]
     },
     {
         id: "berg-bistronomique",
-        title: "Bistronomique Feast",
+        title: "Classic French Sunday Lunch",
         chef: "Bergpaviljoen",
         basePrice: 75,
         image: "/images/menu-classic.png",
@@ -121,6 +137,14 @@ export const menus: Menu[] = [
                 image: "/images/menu-brut.png",
                 price: 24
             }
+        ],
+        extras: [
+            { id: "bp-extra-wine", name: "Regional Wine Pairing", price: 55, image: "/images/menu-brut.png" },
+            { id: "bp-extra-dessert", name: "Chef's Dessert Trolley", price: 25, image: "/images/menu-dessert.png" }
+        ],
+        serviceExtras: [
+            { id: "bp-serv-waiter", name: "Traditional French Service", price: 100, image: "/images/menu-classic.png" },
+            { id: "bp-serv-cleanup", name: "Sunday Evening Cleanup", price: 75, image: "/images/hero-bg.jpg" }
         ]
     },
     {
@@ -148,8 +172,12 @@ export const menus: Menu[] = [
             }
         ],
         extras: [
-            { id: "mango-lassi", name: "Fresh Mango Lassi", price: 5 },
-            { id: "dessert-box", name: "Extra Dessert Box", price: 20 }
+            { id: "mango-lassi", name: "Fresh Mango Lassi", price: 5, image: "/images/menu-ron.png" },
+            { id: "dessert-box", name: "Extra Dessert Box", price: 20, image: "/images/menu-dessert.png" }
+        ],
+        serviceExtras: [
+            { id: "mm-serv-deliv", name: "Priority Home Delivery", price: 15, image: "/images/hero-bg.jpg" },
+            { id: "mm-serv-plating", name: "Authentic Plating Service", price: 45, image: "/images/menu-classic.png" }
         ]
     },
     {
@@ -168,6 +196,13 @@ export const menus: Menu[] = [
                 image: "/images/menu-classic.png",
                 price: 40
             }
+        ],
+        extras: [
+            { id: "led-extra-plantains", name: "Fried Sweet Plantains", price: 12, image: "/images/menu-ron.png" },
+            { id: "led-extra-juice", name: "Fresh Tropical Juice Jug", price: 18, image: "/images/menu-brut.png" }
+        ],
+        serviceExtras: [
+            { id: "led-serv-deliv", name: "Dominican Festive Delivery", price: 20, image: "/images/hero-bg.jpg" }
         ]
     },
     {
@@ -186,6 +221,13 @@ export const menus: Menu[] = [
                 image: "/images/menu-dessert.png",
                 price: 50
             }
+        ],
+        extras: [
+            { id: "ss-extra-coffee", name: "Artisan Coffee Beans (250g)", price: 18, image: "/images/menu-ron.png" },
+            { id: "ss-extra-toppers", name: "Custom Festive Cake Toppers", price: 15, image: "/images/menu-dessert.png" }
+        ],
+        serviceExtras: [
+            { id: "ss-serv-wrap", name: "Luxury Gift Wrapping Service", price: 10, image: "/images/menu-classic.png" }
         ]
     },
     {
@@ -272,8 +314,329 @@ export const menus: Menu[] = [
         description: "East meets West in this spectacular fusion menu. Unexpected flavors for a memorable night.",
         items: [],
         soldOut: true
+    },
+];
+
+// Parameters for Lebanese cuisine distribution
+const lebaneseMains = (prefix: string): MenuItem[] => [
+    {
+        id: `${prefix}-main-warak-enab`,
+        name: "Warak Enab",
+        description: "Stuffed grape leaves filled with rice, herbs, and spices, cooked with potato or carrot slices. — Small €18 / Large €28",
+        image: "/images/dishes/warak_enab.jpg",
+        price: 0,
+        dietary: ["Vegan", "Gluten-Free"],
+        allergens: []
+    },
+    {
+        id: `${prefix}-main-makloubeh`,
+        name: "Makloubeh Aubergine",
+        description: "An upside-down rice dish layered with aubergine, meat or chicken, tomato sauce, and toasted cashews. — Small €22 / Large €32",
+        image: "/images/dishes/makloubeh_aubergine.jpg",
+        price: 0,
+        dietary: ["Halal"],
+        allergens: ["Nuts"]
+    },
+    {
+        id: `${prefix}-main-rice-meat`,
+        name: "Lebanese Rice with Meat and Nuts",
+        description: "Fragrant rice topped with tender lamb or beef and toasted almonds and pine nuts. — Small €22 / Large €32",
+        image: "/images/dishes/lebanese_rice_meat_nuts.jpg",
+        price: 0,
+        dietary: ["Halal"],
+        allergens: ["Nuts"]
+    },
+    {
+        id: `${prefix}-main-chicken-rice`,
+        name: "Chicken Rice Platter",
+        description: "Spiced yellow rice served with roasted chicken, potatoes, cashews, almonds, and fresh parsley. — Small €24 / Large €34",
+        image: "/images/dishes/chicken_rice_platter.jpg",
+        price: 0,
+        dietary: ["Halal"],
+        allergens: ["Nuts"]
+    },
+    {
+        id: `${prefix}-main-grilled-chicken`,
+        name: "Grilled Chicken",
+        description: "Marinated Lebanese-style roasted chicken served with garlic sauce and mezze sides. — €28",
+        image: "/images/dishes/grilled_chicken.jpg",
+        price: 0,
+        dietary: ["Halal"],
+        allergens: []
+    },
+    {
+        id: `${prefix}-main-grilled-lamb-chops`,
+        name: "Grilled Lamb Chops",
+        description: "Seared lamb chops seasoned with Lebanese spices and served with herbs and lemon. — €32",
+        image: "/images/dishes/grilled_lamb_chops.jpg",
+        price: 0,
+        dietary: ["Halal"],
+        allergens: []
+    },
+    {
+        id: `${prefix}-main-crispy-pita`,
+        name: "Crispy Fried Pita",
+        description: "Golden fried pita strips served as a crunchy side for fattoush, dips, and mezze plates. — €10",
+        image: "/images/dishes/crispy_fried_pita.jpg",
+        price: 0,
+        dietary: ["Vegan"],
+        allergens: ["Gluten"]
     }
 ];
+
+const lebaneseStartersAndExtras = (prefix: string): Extra[] => [
+    {
+        id: `${prefix}-extra-hummus`,
+        name: "Hummus",
+        price: 10,
+        image: "/images/dishes/hummus.jpg",
+        description: "A smooth chickpea and tahini dip finished with olive oil and chickpeas. A classic Lebanese mezze staple. — €10"
+    },
+    {
+        id: `${prefix}-extra-hummus-lahme`,
+        name: "Hummus Bil Lahme",
+        price: 14,
+        image: "/images/dishes/hummus_bil_lahme.jpg",
+        description: "Creamy hummus topped with spiced minced meat and toasted nuts. Rich, savory, and perfect for sharing. — €14"
+    },
+    {
+        id: `${prefix}-extra-mutabbal`,
+        name: "Mutabbal Batenjen",
+        price: 12,
+        image: "/images/dishes/mutabbal_batenjen.jpg",
+        description: "Smoky roasted aubergine blended with tahini, lemon, and garlic, finished with olive oil and pomegranate. — €12"
+    },
+    {
+        id: `${prefix}-extra-green-hummus`,
+        name: "Green Herb Hummus",
+        price: 12,
+        image: "/images/dishes/green_herb_hummus.jpg",
+        description: "A vibrant chickpea dip blended with fresh herbs and olive oil. Light, fresh, and modern. — €12"
+    },
+    {
+        id: `${prefix}-extra-tabbouleh`,
+        name: "Tabbouleh",
+        price: 12,
+        image: "/images/dishes/tabbouleh.jpg",
+        description: "Fresh parsley salad with tomato, bulgur, lemon, and olive oil, served with crisp lettuce leaves. — €12"
+    },
+    {
+        id: `${prefix}-extra-fattoush`,
+        name: "Fattoush",
+        price: 12,
+        image: "/images/dishes/fattoush.jpg",
+        description: "A refreshing mixed salad with tomatoes, cucumber, herbs, and crispy fried pita. — €12"
+    },
+    {
+        id: `${prefix}-extra-batata-harra`,
+        name: "Batata Harra",
+        price: 12,
+        image: "/images/dishes/batata_harra.jpg",
+        description: "Crispy potatoes tossed with garlic, coriander, chili, lemon, and fresh herbs. — €12"
+    },
+    {
+        id: `${prefix}-extra-kibbeh`,
+        name: "Kibbeh",
+        price: 14,
+        image: "/images/dishes/kibbeh.jpg",
+        description: "Fried bulgur and meat shells filled with spiced minced meat, onion, and nuts. — €14"
+    },
+    {
+        id: `${prefix}-extra-kibbeh-cups`,
+        name: "Kibbeh Cups",
+        price: 16,
+        image: "/images/dishes/kibbeh_cups.jpg",
+        description: "Mini kibbeh cups filled with hummus and aubergine, finished with pomegranate. — €16"
+    },
+    {
+        id: `${prefix}-extra-pastries`,
+        name: "Fatayer and Sambousek",
+        price: 16,
+        image: "/images/dishes/fatayer_sambousek.jpg",
+        description: "Assorted baked Lebanese pastries filled with spinach, cheese, meat, or za’atar. — €16"
+    },
+    {
+        id: `${prefix}-extra-aubergine-mezze`,
+        name: "Roasted Aubergine and Cauliflower Mezze",
+        price: 14,
+        image: "/images/dishes/roasted_aubergine_cauliflower.jpg",
+        description: "Charred aubergine and cauliflower topped with herbs and toasted nuts. — €14"
+    },
+    {
+        id: `${prefix}-extra-olives`,
+        name: "Olives and Fresh Herb Platter",
+        price: 10,
+        image: "/images/dishes/olives_herb_platter.jpg",
+        description: "A simple mezze plate of olives, mint, radish, spring onion, and fresh greens. — €10"
+    }
+];
+
+const lebaneseDesserts = (prefix: string): Extra[] => [
+    {
+        id: `${prefix}-dessert-knafeh`,
+        name: "Knafeh",
+        price: 14,
+        image: "/images/dishes/knafeh.jpg",
+        description: "A warm Lebanese cheese dessert with a golden semolina crust, served with fragrant sugar syrup. — €14"
+    }
+];
+
+// Append Heaven's Kitchen menus to primary database
+menus.push(
+    {
+        id: "heavens-kitchen-silver",
+        title: "The Elegant Celebration Menu",
+        chef: "Heaven's Kitchen",
+        basePrice: 300,
+        image: "/images/dishes/chicken_rice_platter.jpg",
+        badge: "Classic Gathering",
+        description: "An elegant, multi-course dining experience perfectly tailored for romantic dates, intimate birthday gatherings, or family celebrations.",
+        includes: ["3-Course Signature Meal", "Chef Presentation", "Linen Napkins Included"],
+        items: lebaneseMains("hk-silver"),
+        extras: lebaneseStartersAndExtras("hk-silver"),
+        desserts: lebaneseDesserts("hk-silver"),
+        serviceExtras: [
+            { id: "hk-silver-serv-napkins", name: "Linen Napkins & Custom Tableware", price: 30, image: "/images/dishes/olives_herb_platter.jpg", description: "Beautifully styled cloth napkins and elegant tableware for your setting." },
+            { id: "hk-silver-serv-staff", name: "Professional Waitstaff", price: 240, image: "/images/dishes/roasted_aubergine_cauliflower.jpg" }
+        ]
+    },
+    {
+        id: "hk-workshop",
+        title: "Lebanese Masterclass & Workshop",
+        chef: "Heaven's Kitchen",
+        basePrice: 240,
+        image: "/images/dishes/makloubeh_aubergine.jpg",
+        badge: "Workshop",
+        description: "Learn the secrets of traditional Lebanese cooking in a hands-on masterclass. Prepare classic dips, savory pastries, and master the art of spices.",
+        includes: ["3-Hour Culinary Workshop", "Custom Aprons & Spices", "Shared Dining & Tasting", "Linen Napkins Included"],
+        items: lebaneseMains("hk-workshop"),
+        extras: lebaneseStartersAndExtras("hk-workshop"),
+        desserts: lebaneseDesserts("hk-workshop"),
+        serviceExtras: [
+            { id: "hk-workshop-serv-napkins", name: "Linen Napkins & Custom Tableware", price: 30, image: "/images/dishes/olives_herb_platter.jpg", description: "Beautifully styled cloth napkins and elegant tableware for your setting." },
+            { id: "hk-workshop-serv-gift", name: "Bespoke Ceramic Platter", price: 160, image: "/images/dishes/kibbeh_cups.jpg" }
+        ]
+    },
+    {
+        id: "hk-party",
+        title: "Grand Celebration & Event Feast",
+        chef: "Heaven's Kitchen",
+        basePrice: 400,
+        image: "/images/dishes/grilled_chicken.jpg",
+        badge: "Grand Event",
+        description: "A spectacular celebration banquet featuring a grand selection of hot and cold mezze, delicious grills, and traditional desserts. Perfect for weddings, birthday parties, and corporate events.",
+        includes: ["Grand Celebration Feast", "Event Culinary Styling", "Linen Napkins Included"],
+        items: lebaneseMains("hk-party"),
+        extras: lebaneseStartersAndExtras("hk-party"),
+        desserts: lebaneseDesserts("hk-party"),
+        serviceExtras: [
+            { id: "hk-party-serv-napkins", name: "Linen Napkins & Custom Tableware", price: 30, image: "/images/dishes/olives_herb_platter.jpg", description: "Beautifully styled cloth napkins and elegant tableware for your setting." },
+            { id: "hk-party-serv-music", name: "Live DJ Performance", price: 600, image: "/images/dishes/roasted_aubergine_cauliflower.jpg" }
+        ]
+    },
+    {
+        id: "hk-luxury-tasting",
+        title: "Gourmet Luxury Tasting Journey",
+        chef: "Heaven's Kitchen",
+        basePrice: 700,
+        image: "/images/dishes/grilled_lamb_chops.jpg",
+        badge: "Luxury Tasting",
+        description: "An ultra-refined 5-course degustation menu showcasing the absolute pinnacle of authentic Lebanese gastronomy with elevated presentation.",
+        includes: ["5-Course Premium Tasting", "Sommelier-guided Pairings", "Linen Napkins Included"],
+        items: lebaneseMains("hk-tasting"),
+        extras: lebaneseStartersAndExtras("hk-tasting"),
+        desserts: lebaneseDesserts("hk-tasting"),
+        serviceExtras: [
+            { id: "hk-tasting-serv-napkins", name: "Linen Napkins & Custom Tableware", price: 30, image: "/images/dishes/olives_herb_platter.jpg", description: "Beautifully styled cloth napkins and elegant tableware for your setting." },
+            { id: "hk-tasting-serv-butler", name: "Private White-Glove Butler", price: 400, image: "/images/dishes/tabbouleh.jpg" }
+        ]
+    },
+    {
+        id: "hk-brunch",
+        title: "Beirut Sunrise Pastry Brunch",
+        chef: "Heaven's Kitchen",
+        basePrice: 170,
+        image: "/images/dishes/fatayer_sambousek.jpg",
+        badge: "Pastry Brunch",
+        description: "A bright and warm brunch experience focusing on freshly baked traditional pastries, refreshing herbaceous dips, and classic breakfast bites.",
+        includes: ["Fresh Pastry Assortment", "Morning Coffee & Tea Station", "Linen Napkins Included"],
+        items: lebaneseMains("hk-brunch"),
+        extras: lebaneseStartersAndExtras("hk-brunch"),
+        desserts: lebaneseDesserts("hk-brunch"),
+        serviceExtras: [
+            { id: "hk-brunch-serv-napkins", name: "Linen Napkins & Custom Tableware", price: 30, image: "/images/dishes/olives_herb_platter.jpg", description: "Beautifully styled cloth napkins and elegant tableware for your setting." },
+            { id: "hk-brunch-serv-butler", name: "Mimosa Butler Service", price: 190, image: "/images/dishes/kibbeh_cups.jpg" }
+        ]
+    },
+    {
+        id: "hk-subscription",
+        title: "Weekly Premium Meal Subscription",
+        chef: "Heaven's Kitchen",
+        basePrice: 440,
+        image: "/images/dishes/chicken_rice_platter.jpg",
+        badge: "Subscription",
+        description: "Three complete, fresh, chef-prepared Lebanese meals portioned for your week. Savor hearty authentic main courses and delicious starters with zero effort.",
+        includes: ["3 Chef-Prepared Meals Weekly", "Calorie & Macro Labeling", "Linen Napkins Included"],
+        items: lebaneseMains("hk-sub"),
+        extras: lebaneseStartersAndExtras("hk-sub"),
+        desserts: lebaneseDesserts("hk-sub"),
+        serviceExtras: [
+            { id: "hk-sub-serv-napkins", name: "Linen Napkins Pack", price: 30, image: "/images/dishes/olives_herb_platter.jpg", description: "Premium reusable linen napkins for your weekly dining setup." },
+            { id: "hk-sub-serv-consult", name: "Personalized Nutrition Consultation", price: 240, image: "/images/dishes/kibbeh_cups.jpg" }
+        ]
+    },
+    {
+        id: "hk-table-setup",
+        title: "Royal Table Setup & Dining",
+        chef: "Heaven's Kitchen",
+        basePrice: 320,
+        image: "/images/dishes/lebanese_rice_meat_nuts.jpg",
+        badge: "Table Setup",
+        description: "A breathtaking visual and culinary experience. We transform your dining space with luxury centerpieces, custom tableware, and serve a stunning classic Lebanese menu.",
+        includes: ["Luxury Centerpieces & Linens", "Full Dinner Set Presentation", "Linen Napkins Included"],
+        items: lebaneseMains("hk-setup"),
+        extras: lebaneseStartersAndExtras("hk-setup"),
+        desserts: lebaneseDesserts("hk-setup"),
+        serviceExtras: [
+            { id: "hk-setup-serv-napkins", name: "Linen Napkins & Custom Tableware", price: 30, image: "/images/dishes/olives_herb_platter.jpg", description: "Beautifully styled cloth napkins and elegant tableware for your setting." },
+            { id: "hk-setup-serv-cleanup", name: "Full Table Cleanup & Removal", price: 190, image: "/images/dishes/kibbeh.jpg" }
+        ]
+    },
+    {
+        id: "hk-cook-with-chef",
+        title: "Collaborative Chef's Kitchen",
+        chef: "Heaven's Kitchen",
+        basePrice: 260,
+        image: "/images/dishes/grilled_chicken.jpg",
+        badge: "Cook with Chef",
+        description: "Don't just eat—cook alongside a master chef! A fun, highly interactive dining experience where you learn core Lebanese techniques while preparing a beautiful feast.",
+        includes: ["Hands-on Chef Guidance", "Recipe Folder & Kitchen Gift", "Linen Napkins Included"],
+        items: lebaneseMains("hk-cook"),
+        extras: lebaneseStartersAndExtras("hk-cook"),
+        desserts: lebaneseDesserts("hk-cook"),
+        serviceExtras: [
+            { id: "hk-cook-serv-napkins", name: "Linen Napkins & Custom Tableware", price: 30, image: "/images/dishes/olives_herb_platter.jpg", description: "Beautifully styled cloth napkins and elegant tableware for your setting." },
+            { id: "hk-cook-serv-photo", name: "Culinary Action Photoshoot", price: 400, image: "/images/olives_herb_platter.jpg" }
+        ]
+    },
+    {
+        id: "heavens-kitchen-gold",
+        title: "The Royal Banquet & Tasting",
+        chef: "Heaven's Kitchen",
+        basePrice: 500,
+        image: "/images/dishes/lebanese_rice_meat_nuts.jpg",
+        badge: "Royal Banquet",
+        description: "The grandest multi-course feast featuring premium Wagyu, slow-roasted lamb, lobster, and gold leaf.",
+        includes: ["Royal Lebanese Dining Experience", "Chef's Storytelling Presentation", "Linen Napkins Included"],
+        items: lebaneseMains("hk-gold"),
+        extras: lebaneseStartersAndExtras("hk-gold"),
+        desserts: lebaneseDesserts("hk-gold"),
+        serviceExtras: [
+            { id: "hk-gold-serv-napkins", name: "Linen Napkins & Custom Tableware", price: 30, image: "/images/dishes/olives_herb_platter.jpg", description: "Beautifully styled cloth napkins and elegant tableware for your setting." },
+            { id: "hk-gold-serv-tamada", name: "Professional Chef Tamada (Host)", price: 500, image: "/images/dishes/kibbeh_cups.jpg" }
+        ]
+    }
+);
 
 export const occasions: Occasion[] = [
     {
@@ -332,6 +695,7 @@ export interface Chef {
     languages: string[];
     awards?: string[];
     philosophy?: string;
+    verticalVideos?: string[];
 }
 
 export const chefs: Chef[] = [
@@ -436,21 +800,59 @@ export const chefs: Chef[] = [
     {
         slug: "ocean-blue",
         name: "Ocean Blue",
-        image: "/images/chefs/ocean.png",
+        image: "/images/chefs/berg.png",
         heroImage: "/images/menu-seafood.png",
-        description: "Seafood specialist.",
-        longDescription: "Ocean Blue is dedicated to the treasures of the sea. Their chefs specialize in sourcing the freshest sustainable seafood and preparing it with techniques that highlight its natural brilliance. From raw bars to grilled masterpieces, it's a celebration of all things aquatic.",
-        philosophy: "Respect the ocean by choosing sustainable seafood and letting its natural flavors shine.",
-        awards: ["Sustainable Seafood Award", "Best Seafood Experience"],
+        description: "The masters of the sea.",
+        longDescription: "Ocean Blue specializes in bringing the freshest, most sustainable seafood directly to your table. Their expertise lies in honoring the delicate flavors of the ocean, using minimal intervention to let the natural quality shine.",
+        philosophy: "Respect the ocean, and it will reward you with the finest flavors.",
         gallery: [
             "/images/menu-seafood.png",
             "/images/menu-classic.png",
-            "/images/menu-ron.png",
-            "/images/menu-brut.png"
+            "/images/menu-brut.png",
+            "/images/menu-ron.png"
         ],
-        specialties: ["Sustainable Seafood", "Raw Bar", "Mediterranean Fish", "Shellfish Platters", "Smoked Specialties"],
-        experience: "18+ Years",
+        specialties: ["Sustainable Seafood", "Oyster Shucking", "Sushi & Sashimi", "Mediterranean Style"],
+        experience: "15+ Years",
         languages: ["Dutch", "English", "Spanish"]
+    },
+    {
+        slug: "heavens-kitchen",
+        name: "Heaven's Kitchen",
+        image: "/images/dishes/hummus.jpg",
+        heroImage: "/images/chefs/heavens-kitchen-hero.png",
+        description: "Premium pre-packaged dining experiences.",
+        longDescription: "Heaven's Kitchen is designed to bring you unparalleled culinary experiences with our premium, pre-packaged service plans. We craft every dish with exquisite attention to detail and offer a tailored approach that fits your sophisticated taste.",
+        philosophy: "Taste the divine in every bite, wrapped in a premium package.",
+        gallery: [
+            "/images/dishes/hummus.jpg",
+            "/images/dishes/hummus_bil_lahme.jpg",
+            "/images/dishes/mutabbal_batenjen.jpg",
+            "/images/dishes/green_herb_hummus.jpg",
+            "/images/dishes/tabbouleh.jpg",
+            "/images/dishes/fattoush.jpg",
+            "/images/dishes/batata_harra.jpg",
+            "/images/dishes/kibbeh.jpg",
+            "/images/dishes/kibbeh_cups.jpg",
+            "/images/dishes/fatayer_sambousek.jpg",
+            "/images/dishes/roasted_aubergine_cauliflower.jpg",
+            "/images/dishes/olives_herb_platter.jpg",
+            "/images/dishes/warak_enab.jpg",
+            "/images/dishes/makloubeh_aubergine.jpg",
+            "/images/dishes/lebanese_rice_meat_nuts.jpg",
+            "/images/dishes/chicken_rice_platter.jpg",
+            "/images/dishes/grilled_chicken.jpg",
+            "/images/dishes/grilled_lamb_chops.jpg",
+            "/images/dishes/crispy_fried_pita.jpg",
+            "/images/dishes/knafeh.jpg"
+        ],
+        specialties: ["Premium Deals", "Exclusive Ingredients", "Fine Dining", "Custom Menus"],
+        experience: "20+ Years",
+        languages: ["Dutch", "English", "Arabic"],
+        verticalVideos: [
+            "https://assets.mixkit.co/videos/preview/mixkit-chef-preparing-a-salad-with-fresh-ingredients-41130-large.mp4",
+            "https://assets.mixkit.co/videos/preview/mixkit-chef-cutting-vegetables-on-a-wooden-board-41131-large.mp4",
+            "https://assets.mixkit.co/videos/preview/mixkit-chef-preparing-a-dish-in-a-professional-kitchen-41132-large.mp4"
+        ]
     },
     {
         slug: "moms-magic",

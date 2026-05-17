@@ -1,7 +1,7 @@
 "use client";
 
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Menu, chefs } from '@/lib/data';
 
@@ -12,9 +12,18 @@ interface MenuCardProps {
 }
 
 export default function MenuCard({ menu, index = 0, priority = false }: MenuCardProps) {
+    const router = useRouter();
     const isSoldOut = menu.soldOut;
     const chef = chefs.find(c => c.name === menu.chef);
     const chefLink = chef ? `/chef/${chef.slug}` : '#';
+
+    const handleChefClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (chefLink !== '#') {
+            router.push(chefLink);
+        }
+    };
 
     return (
         <motion.div
@@ -59,13 +68,12 @@ export default function MenuCard({ menu, index = 0, priority = false }: MenuCard
             <h3 className={`text-2xl font-heading font-bold text-dark mb-1 transition-colors ${isSoldOut ? 'text-gray-500' : 'group-hover:text-orange'}`}>
                 {menu.title}
             </h3>
-            <Link 
-                href={chefLink} 
-                className="text-light text-sm font-medium uppercase tracking-wide mb-4 hover:text-orange transition-colors inline-block z-10 relative"
-                onClick={(e) => e.stopPropagation()}
+            <div 
+                onClick={handleChefClick}
+                className="text-light text-sm font-medium uppercase tracking-wide mb-4 hover:text-orange transition-colors inline-block z-10 relative cursor-pointer"
             >
                 {menu.chef}
-            </Link>
+            </div>
 
             <div className="flex justify-between items-center border-t border-dark/10 pt-4 mt-auto">
                 <span className={`font-bold text-dark text-lg ${isSoldOut ? 'line-through text-gray-400' : ''}`}>
@@ -80,16 +88,19 @@ export default function MenuCard({ menu, index = 0, priority = false }: MenuCard
                         </span>
 
                         {/* Quick Book Button */}
-                        <a
-                            href={`#booking?menu=${encodeURIComponent(menu.title)}`}
+                        <button
                             onClick={(e) => {
+                                e.preventDefault();
                                 e.stopPropagation();
-                                // Optional: Smooth scroll manually if needed, but anchor tag works
+                                const bookingSection = document.getElementById('booking');
+                                if (bookingSection) {
+                                    bookingSection.scrollIntoView({ behavior: 'smooth' });
+                                }
                             }}
-                            className="bg-orange text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full shadow-md hover:bg-dark transition-colors transform hover:-translate-y-0.5 active:translate-y-0"
+                            className="bg-orange text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-full shadow-md hover:bg-dark transition-colors transform hover:-translate-y-0.5 active:translate-y-0 z-10 relative"
                         >
                             Book
-                        </a>
+                        </button>
                     </div>
                 ) : (
                     <span className="text-gray-400 font-semibold text-xs uppercase tracking-wide">

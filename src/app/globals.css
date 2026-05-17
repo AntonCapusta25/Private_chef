@@ -1,25 +1,49 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'NewSpirit';
+  src: url('https://firebasestorage.googleapis.com/v0/b/homemademeals-7040d.appspot.com/o/fonts%2FNewSpirit-BoldCondensed.ttf?alt=media&token=c8efe058-eff2-4ae3-937e-5ec9d0d760cd') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-cream: #FFF8F0;
-  --color-dark: #2D2420;
+  --color-cream: #FDFBF7;
+  --color-dark: #412B1A;
   --color-light: #5D5D5D;
   --color-orange: #F27D42;
+  --color-purple: #802164;
+  --color-magenta: #C0318E;
+  --color-espresso: #412B1A;
 
-  --font-heading: var(--font-fraunces), serif;
+  --font-heading: 'NewSpirit', var(--font-fraunces), serif;
   --font-body: var(--font-inter), sans-serif;
   --font-sans: var(--font-inter), sans-serif;
 }
 
 :root {
-  --background: #FFF8F0;
-  --foreground: #2D2420;
+  --background: #F9F3E9;
+  --foreground: #412B1A;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-body);
+}
+
+.lebanese-pattern {
+  background-image: radial-gradient(#8B2B8A 0.5px, transparent 0.5px);
+  background-size: 20px 20px;
+  opacity: 0.1;
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, #8B2B8A 0%, #C0318E 100%);
+}
+
+.orange-gradient {
+  background: linear-gradient(135deg, #F27D42 0%, #FF9E6A 100%);
 }

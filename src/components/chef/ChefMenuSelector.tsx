@@ -9,7 +9,7 @@ import Image from "next/image";
 interface ChefMenuSelectorProps {
     chef: Chef;
     menus: Menu[];
-    onSelectionChange?: (menuId: string, totalPrice: number) => void;
+    onSelectionChange?: (menuId: string, totalPrice: number, summary: string) => void;
 }
 
 export default function ChefMenuSelector({ chef, menus, onSelectionChange }: ChefMenuSelectorProps) {
@@ -17,6 +17,9 @@ export default function ChefMenuSelector({ chef, menus, onSelectionChange }: Che
     const [selectedDishes, setSelectedDishes] = useState<Record<string, boolean>>({});
     const [selectedExtras, setSelectedExtras] = useState<Record<string, boolean>>({});
     const [activeDishModal, setActiveDishModal] = useState<MenuItem | null>(null);
+    const [activeMenuModal, setActiveMenuModal] = useState<Menu | null>(null);
+    const [modalStep, setModalStep] = useState<1 | 2 | 3 | 4>(1);
+    const [filterTab, setFilterTab] = useState<string>("All");
 
     const activeMenu = useMemo(() => menus.find(m => m.id === selectedMenuId), [selectedMenuId, menus]);
 
@@ -36,15 +39,47 @@ export default function ChefMenuSelector({ chef, menus, onSelectionChange }: Che
             }
         });
 
+        activeMenu.desserts?.forEach(dessert => {
+            if (selectedExtras[dessert.id]) {
+                total += dessert.price;
+            }
+        });
+
+        activeMenu.serviceExtras?.forEach(service => {
+            if (selectedExtras[service.id]) {
+                total += service.price;
+            }
+        });
+
         return total;
     }, [activeMenu, selectedDishes, selectedExtras]);
 
     // Notify parent of changes
     useEffect(() => {
-        if (onSelectionChange) {
-            onSelectionChange(selectedMenuId, totalPrice);
+        if (onSelectionChange && activeMenu) {
+            const selectedDishNames = Object.keys(selectedDishes)
+                .filter(id => selectedDishes[id])
+                .map(id => activeMenu.items.find(i => i.id === id)?.name)
+                .filter(Boolean);
+
+            const selectedExtraNames = Object.keys(selectedExtras)
+                .filter(id => selectedExtras[id])
+                .map(id => 
+                    activeMenu.extras?.find(e => e.id === id)?.name || 
+                    activeMenu.desserts?.find(d => d.id === id)?.name || 
+                    activeMenu.serviceExtras?.find(s => s.id === id)?.name
+                )
+                .filter(Boolean);
+
+            const summary = [
+                `Package: ${activeMenu.title}`,
+                selectedDishNames.length > 0 ? `Dishes: ${selectedDishNames.join(', ')}` : '',
+                selectedExtraNames.length > 0 ? `Extras & Services: ${selectedExtraNames.join(', ')}` : ''
+            ].filter(Boolean).join(' | ');
+
+            onSelectionChange(selectedMenuId, totalPrice, summary);
         }
-    }, [selectedMenuId, totalPrice, onSelectionChange]);
+    }, [selectedMenuId, totalPrice, onSelectionChange, activeMenu, selectedDishes, selectedExtras]);
 
     const toggleDish = (id: string) => {
         setSelectedDishes(prev => ({ ...prev, [id]: !prev[id] }));
@@ -65,98 +100,322 @@ export default function ChefMenuSelector({ chef, menus, onSelectionChange }: Che
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     {/* Menu Selection (Left) */}
                     <div className="lg:col-span-2 space-y-12">
-                        <div className="flex flex-wrap gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {menus.map(menu => (
-                                <button
+                                <div
                                     key={menu.id}
                                     onClick={() => {
                                         setSelectedMenuId(menu.id);
-                                        setSelectedDishes({});
-                                        setSelectedExtras({});
+                                        setActiveMenuModal(menu);
                                     }}
-                                    className={`px-8 py-4 rounded-2xl font-bold transition-all ${
-                                        selectedMenuId === menu.id 
-                                        ? "bg-orange text-white shadow-xl scale-105" 
-                                        : "bg-cream text-dark hover:bg-orange/10"
-                                    }`}
+                                    className={`
+                                        group h-full flex flex-col bg-white p-4 rounded-[2rem] shadow-xl border 
+                                        transition-all duration-300 relative cursor-pointer hover:shadow-2xl
+                                        ${selectedMenuId === menu.id ? 'border-orange ring-2 ring-orange/50 scale-[1.02]' : 'border-white/40 hover:-translate-y-1'}
+                                    `}
                                 >
-                                    {menu.title}
-                                </button>
+                                    <div className="relative h-[200px] rounded-3xl overflow-hidden mb-6 bg-gray-200">
+                                        <Image
+                                            src={menu.image}
+                                            alt={menu.title}
+                                            fill
+                                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </div>
+                                    
+                                    <h3 className={`text-2xl font-heading font-bold mb-1 transition-colors ${selectedMenuId === menu.id ? 'text-orange' : 'text-dark group-hover:text-orange'}`}>
+                                        {menu.title}
+                                    </h3>
+                                    
+                                    <p className="text-gray-500 text-sm line-clamp-2 mb-4">
+                                        {menu.description}
+                                    </p>
+
+                                    {menu.includes && menu.includes.length > 0 && (
+                                        <div className="mb-4">
+                                            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Includes:</p>
+                                            <ul className="text-sm text-gray-600 space-y-1">
+                                                {menu.includes.map((item, idx) => (
+                                                    <li key={idx} className="flex items-center gap-2">
+                                                        <div className="w-1 h-1 rounded-full bg-orange" />
+                                                        {item}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+                                    
+                                    <div className="flex justify-between items-center border-t border-dark/10 pt-4 mt-auto">
+                                        <span className="font-bold text-dark text-lg">
+                                            €{menu.basePrice} <span className="text-sm font-normal text-gray-500">starting price</span>
+                                        </span>
+                                        <button className={`
+                                            px-4 py-2 rounded-xl text-sm font-bold transition-all duration-300
+                                            ${selectedMenuId === menu.id ? 'bg-orange text-white' : 'bg-gray-100 text-espresso group-hover:bg-espresso group-hover:text-white'}
+                                        `}>
+                                            {selectedMenuId === menu.id ? 'Configuring...' : 'Configure'}
+                                        </button>
+                                    </div>
+                                </div>
                             ))}
                         </div>
 
-                        {activeMenu && (
+                {/* Package Details Modal - Multi-Step */}
+                <AnimatePresence>
+                    {activeMenuModal && (
+                        <div className="fixed inset-0 z-[100] flex items-center justify-center px-5">
                             <motion.div
-                                key={activeMenu.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="space-y-10"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => {
+                                    setActiveMenuModal(null);
+                                    setModalStep(1);
+                                    setFilterTab("All");
+                                }}
+                                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+                            />
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                className="relative bg-white rounded-[3rem] overflow-hidden max-w-5xl w-full max-h-[90vh] flex flex-col shadow-2xl"
                             >
-                                <div className="space-y-6">
-                                    <h3 className="text-3xl font-heading font-bold text-dark">Included Dishes</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {activeMenu.items.map(item => (
-                                            <div
-                                                key={item.id}
-                                                onClick={() => setActiveDishModal(item)}
-                                                className={`group relative bg-cream/30 rounded-3xl p-6 border-2 transition-all cursor-pointer ${
-                                                    selectedDishes[item.id] ? "border-orange bg-white shadow-lg" : "border-transparent hover:border-orange/30"
-                                                }`}
-                                            >
-                                                <div className="relative aspect-video rounded-2xl overflow-hidden mb-6">
-                                                    <Image
-                                                        src={item.image}
-                                                        alt={item.name}
-                                                        fill
-                                                        className="object-cover transition-transform duration-700 group-hover:scale-125"
-                                                    />
-                                                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                        <span className="bg-white text-dark px-4 py-2 rounded-full font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition-transform">View Details</span>
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-between items-start mb-2">
-                                                    <h4 className="text-xl font-bold text-dark">{item.name}</h4>
-                                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                                        selectedDishes[item.id] ? "bg-orange border-orange text-white" : "border-gray-300"
-                                                    }`}>
-                                                        {selectedDishes[item.id] && <Check size={14} />}
-                                                    </div>
-                                                </div>
-                                                <p className="text-gray-600 text-sm mb-4 line-clamp-2">{item.description}</p>
-                                                <p className="text-orange font-bold">+ €{item.price}</p>
-                                            </div>
-                                        ))}
+                                {/* Modal Header */}
+                                <div className="p-8 md:p-12 border-b border-gray-100 flex justify-between items-center bg-white sticky top-0 z-10">
+                                    <div>
+                                        <div className="flex items-center gap-4 mb-2">
+                                            <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${modalStep === 1 ? 'bg-orange text-white' : 'bg-gray-100 text-gray-400'}`}>1</span>
+                                            <div className="h-px w-6 bg-gray-200" />
+                                            <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${modalStep === 2 ? 'bg-orange text-white' : 'bg-gray-100 text-gray-400'}`}>2</span>
+                                            <div className="h-px w-6 bg-gray-200" />
+                                            <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${modalStep === 3 ? 'bg-orange text-white' : 'bg-gray-100 text-gray-400'}`}>3</span>
+                                            <div className="h-px w-6 bg-gray-200" />
+                                            <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${modalStep === 4 ? 'bg-orange text-white' : 'bg-gray-100 text-gray-400'}`}>4</span>
+                                        </div>
+                                        <h2 className="text-3xl md:text-5xl font-heading font-bold text-espresso">
+                                            {modalStep === 1 ? "Included Signature Dishes" : modalStep === 2 ? "Starters & Extras" : modalStep === 3 ? "Sweet Desserts" : "Event & Service Extras"}
+                                        </h2>
                                     </div>
+                                    <button 
+                                        onClick={() => {
+                                            setActiveMenuModal(null);
+                                            setModalStep(1);
+                                            setFilterTab("All");
+                                        }}
+                                        className="p-4 rounded-full bg-gray-100 text-espresso hover:bg-orange/10 transition-colors"
+                                    >
+                                        <Plus className="rotate-45" size={24} />
+                                    </button>
                                 </div>
 
-                                {activeMenu.extras && activeMenu.extras.length > 0 && (
-                                    <div className="space-y-6">
-                                        <h3 className="text-3xl font-heading font-bold text-dark">Enhance Your Experience</h3>
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            {activeMenu.extras.map(extra => (
-                                                <div
-                                                    key={extra.id}
-                                                    onClick={() => toggleExtra(extra.id)}
-                                                    className={`flex justify-between items-center p-6 rounded-2xl border-2 cursor-pointer transition-all ${
-                                                        selectedExtras[extra.id] ? "border-orange bg-white shadow-md" : "border-cream bg-cream/20 hover:border-orange/20"
-                                                    }`}
-                                                >
-                                                    <div>
-                                                        <p className="font-bold text-dark">{extra.name}</p>
-                                                        <p className="text-orange text-sm">+ €{extra.price}</p>
-                                                    </div>
-                                                    <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
-                                                        selectedExtras[extra.id] ? "bg-orange border-orange text-white" : "border-gray-300"
-                                                    }`}>
-                                                        {selectedExtras[extra.id] && <Check size={14} />}
-                                                    </div>
+                                {/* Modal Content */}
+                                <div className="flex-1 overflow-y-auto p-8 md:p-12 custom-scrollbar bg-gray-50/50">
+                                    {modalStep === 1 ? (
+                                        <div className="space-y-8">
+                                            {/* Dietary Tabs */}
+                                            {activeMenuModal.items.some(item => item.dietary && item.dietary.length > 0) && (
+                                                <div className="flex gap-2 overflow-x-auto pb-4 custom-scrollbar">
+                                                    {["All", ...Array.from(new Set(activeMenuModal.items.flatMap(i => i.dietary || [])))].map(tab => (
+                                                        <button
+                                                            key={tab}
+                                                            onClick={() => setFilterTab(tab)}
+                                                            className={`px-6 py-2 rounded-full text-sm font-bold whitespace-nowrap transition-all ${
+                                                                filterTab === tab ? "bg-orange text-white" : "bg-white text-gray-500 border border-gray-200 hover:border-orange/50"
+                                                            }`}
+                                                        >
+                                                            {tab}
+                                                        </button>
+                                                    ))}
                                                 </div>
-                                            ))}
+                                            )}
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                {activeMenuModal.items
+                                                    .filter(item => filterTab === "All" || item.dietary?.includes(filterTab))
+                                                    .map(item => (
+                                                    <div key={item.id} className="bg-white rounded-[2.5rem] overflow-hidden shadow-sm border border-gray-100 group hover:shadow-xl transition-all">
+                                                        <div className="relative h-48 w-full overflow-hidden">
+                                                            <Image src={item.image} alt={item.name} fill className="object-cover transition-transform duration-700 group-hover:scale-110" />
+                                                            <div className="absolute top-4 right-4 bg-orange text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                                                Included
+                                                            </div>
+                                                            {item.dietary && item.dietary.length > 0 && (
+                                                                <div className="absolute top-4 left-4 flex gap-2">
+                                                                    {item.dietary.map(d => (
+                                                                        <span key={d} className="bg-white/90 backdrop-blur text-espresso px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest">
+                                                                            {d}
+                                                                        </span>
+                                                                    ))}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="p-6">
+                                                            <h4 className="text-xl font-bold text-espresso mb-2">{item.name}</h4>
+                                                            <p className="text-gray-500 text-sm line-clamp-2 mb-4">{item.description}</p>
+                                                            
+                                                            {item.allergens && item.allergens.length > 0 && (
+                                                                <div className="pt-4 border-t border-gray-100 flex items-center gap-2 text-xs text-orange font-medium">
+                                                                    <Sparkles size={14} />
+                                                                    <span>Allergens: {item.allergens.join(", ")}</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
+                                    ) : modalStep === 2 ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {activeMenuModal.extras && activeMenuModal.extras.length > 0 ? (
+                                                activeMenuModal.extras.map(extra => (
+                                                    <div
+                                                        key={extra.id}
+                                                        onClick={() => toggleExtra(extra.id)}
+                                                        className={`group relative flex items-center gap-6 p-4 rounded-[2rem] border-2 cursor-pointer transition-all ${
+                                                            selectedExtras[extra.id] ? "border-orange bg-white shadow-lg" : "border-transparent bg-white/50 hover:border-orange/20"
+                                                        }`}
+                                                    >
+                                                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100">
+                                                            {extra.image ? (
+                                                                <Image src={extra.image} alt={extra.name} fill className="object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center">
+                                                                    <ShoppingBag className="text-gray-300" size={32} />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <p className="font-bold text-espresso mb-1">{extra.name}</p>
+                                                            <p className="text-orange font-bold">€{extra.price}</p>
+                                                        </div>
+                                                        <div className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all ${
+                                                            selectedExtras[extra.id] ? "bg-orange border-orange text-white" : "border-gray-200"
+                                                        }`}>
+                                                            {selectedExtras[extra.id] ? <Check size={20} /> : <Plus size={20} />}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="col-span-2 py-20 text-center text-gray-400">
+                                                    No food extras available for this package.
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : modalStep === 3 ? (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {activeMenuModal.desserts && activeMenuModal.desserts.length > 0 ? (
+                                                activeMenuModal.desserts.map(dessert => (
+                                                    <div
+                                                        key={dessert.id}
+                                                        onClick={() => toggleExtra(dessert.id)}
+                                                        className={`group relative flex items-center gap-6 p-4 rounded-[2rem] border-2 cursor-pointer transition-all ${
+                                                            selectedExtras[dessert.id] ? "border-orange bg-white shadow-lg" : "border-transparent bg-white/50 hover:border-orange/20"
+                                                        }`}
+                                                    >
+                                                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100">
+                                                            {dessert.image ? (
+                                                                <Image src={dessert.image} alt={dessert.name} fill className="object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center">
+                                                                    <ShoppingBag className="text-gray-300" size={32} />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <p className="font-bold text-espresso mb-1">{dessert.name}</p>
+                                                            <p className="text-orange font-bold">€{dessert.price}</p>
+                                                        </div>
+                                                        <div className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all ${
+                                                            selectedExtras[dessert.id] ? "bg-orange border-orange text-white" : "border-gray-200"
+                                                        }`}>
+                                                            {selectedExtras[dessert.id] ? <Check size={20} /> : <Plus size={20} />}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="col-span-2 py-20 text-center text-gray-400">
+                                                    No desserts available for this package.
+                                                </div>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {activeMenuModal.serviceExtras && activeMenuModal.serviceExtras.length > 0 ? (
+                                                activeMenuModal.serviceExtras.map(service => (
+                                                    <div
+                                                        key={service.id}
+                                                        onClick={() => toggleExtra(service.id)}
+                                                        className={`group relative flex items-center gap-6 p-4 rounded-[2rem] border-2 cursor-pointer transition-all ${
+                                                            selectedExtras[service.id] ? "border-orange bg-white shadow-lg" : "border-transparent bg-white/50 hover:border-orange/20"
+                                                        }`}
+                                                    >
+                                                        <div className="relative w-24 h-24 rounded-2xl overflow-hidden flex-shrink-0 bg-gray-100">
+                                                            {service.image ? (
+                                                                <Image src={service.image} alt={service.name} fill className="object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center">
+                                                                    <UtensilsCrossed className="text-gray-300" size={32} />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1">
+                                                            <p className="font-bold text-espresso mb-1">{service.name}</p>
+                                                            <p className="text-orange font-bold">€{service.price}</p>
+                                                        </div>
+                                                        <div className={`w-10 h-10 rounded-xl border-2 flex items-center justify-center transition-all ${
+                                                            selectedExtras[service.id] ? "bg-orange border-orange text-white" : "border-gray-200"
+                                                        }`}>
+                                                            {selectedExtras[service.id] ? <Check size={20} /> : <Plus size={20} />}
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="col-span-2 py-20 text-center text-gray-400">
+                                                    No service extras available for this package.
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Modal Footer */}
+                                <div className="p-8 md:p-10 border-t border-gray-100 bg-white flex justify-between items-center">
+                                    <div className="hidden md:block">
+                                        <p className="text-gray-400 text-sm">Package: <span className="text-espresso font-bold">{activeMenuModal.title}</span></p>
+                                        <p className="text-orange font-bold text-xl">€{totalPrice}</p>
                                     </div>
-                                )}
+                                    <div className="flex gap-4 w-full md:w-auto">
+                                        {modalStep > 1 && (
+                                            <button
+                                                onClick={() => setModalStep(prev => (prev - 1) as any)}
+                                                className="px-8 py-4 rounded-2xl bg-gray-100 text-espresso font-bold hover:bg-gray-200 transition-all flex-1 md:flex-none"
+                                            >
+                                                Back
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={() => {
+                                                if (modalStep === 1) setModalStep(2);
+                                                else if (modalStep === 2) setModalStep(3);
+                                                else if (modalStep === 3) setModalStep(4);
+                                                else {
+                                                    setActiveMenuModal(null);
+                                                    setModalStep(1);
+                                                    document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" });
+                                                }
+                                            }}
+                                            className="px-12 py-4 rounded-2xl orange-gradient text-white font-bold shadow-lg shadow-orange/20 hover:-translate-y-1 transition-all flex-1 md:flex-none flex items-center justify-center gap-2"
+                                        >
+                                            {modalStep === 1 ? "Next: Starters & Extras" : modalStep === 2 ? "Next: Sweet Desserts" : modalStep === 3 ? "Next: Service Extras" : "Confirm Selection"}
+                                            <ChevronRight size={20} />
+                                        </button>
+                                    </div>
+                                </div>
                             </motion.div>
-                        )}
+                        </div>
+                    )}
+                </AnimatePresence>
                     </div>
 
                     {/* Summary (Right) */}
@@ -178,17 +437,17 @@ export default function ChefMenuSelector({ chef, menus, onSelectionChange }: Che
                                     return (
                                         <div key={id} className="flex justify-between items-center text-sm">
                                             <span className="text-white/80 line-clamp-1">{item?.name}</span>
-                                            <span className="text-orange">+€{item?.price}</span>
+                                            <span className="text-orange font-bold">+€{item?.price}</span>
                                         </div>
                                     );
                                 })}
 
                                 {Object.keys(selectedExtras).filter(id => selectedExtras[id]).map(id => {
-                                    const extra = activeMenu?.extras?.find(e => e.id === id);
+                                    const extra = activeMenu?.extras?.find(e => e.id === id) || activeMenu?.serviceExtras?.find(s => s.id === id);
                                     return (
                                         <div key={id} className="flex justify-between items-center text-sm">
                                             <span className="text-white/80 line-clamp-1">{extra?.name}</span>
-                                            <span className="text-orange">+€{extra?.price}</span>
+                                            <span className="text-orange font-bold">+€{extra?.price}</span>
                                         </div>
                                     );
                                 })}
@@ -202,7 +461,7 @@ export default function ChefMenuSelector({ chef, menus, onSelectionChange }: Che
 
                                 <button
                                     onClick={() => document.getElementById("booking")?.scrollIntoView({ behavior: "smooth" })}
-                                    className="w-full bg-orange text-white py-5 rounded-2xl font-bold text-lg hover:bg-orange/90 transition-all flex items-center justify-center gap-2 group shadow-xl shadow-orange/20"
+                                    className="w-full orange-gradient text-white py-5 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-2 group shadow-xl shadow-orange/20"
                                 >
                                     Proceed to Booking
                                     <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -251,8 +510,7 @@ export default function ChefMenuSelector({ chef, menus, onSelectionChange }: Che
                                 <div>
                                     <div className="flex justify-between items-start mb-6">
                                         <div>
-                                            <h3 className="text-4xl font-heading font-bold text-dark mb-2">{activeDishModal.name}</h3>
-                                            <span className="px-3 py-1 bg-orange/10 text-orange text-xs font-bold rounded-full uppercase tracking-wider">Chef's Specialty</span>
+                                            <h3 className="text-4xl font-heading font-bold text-espresso mb-2">{activeDishModal.name}</h3>
                                         </div>
                                         <p className="text-3xl font-bold text-orange">€{activeDishModal.price}</p>
                                     </div>
@@ -261,8 +519,7 @@ export default function ChefMenuSelector({ chef, menus, onSelectionChange }: Che
                                     </p>
 
                                     <div className="space-y-6">
-                                        <h4 className="font-bold text-dark flex items-center gap-2">
-                                            <Sparkles size={18} className="text-orange" />
+                                        <h4 className="font-bold text-espresso flex items-center gap-2">
                                             Customization Options
                                         </h4>
                                         <div className="space-y-4">
