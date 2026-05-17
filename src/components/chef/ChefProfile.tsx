@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Chef, menus } from "@/lib/data";
 import { ChefHat, Star, Clock, Globe, Play, Utensils, Sparkles, MapPin, Share2, Award, UtensilsCrossed, ChevronLeft, ChevronRight, Plus } from "lucide-react";
@@ -28,10 +28,25 @@ interface ChefProfileProps {
 
 export default function ChefProfile({ chef }: ChefProfileProps) {
     const chefMenus = menus.filter(m => m.chef === chef.name);
+    const verticalVideos = chef.verticalVideos || [];
     const [selectedMenu, setSelectedMenu] = useState<string>(chefMenus[0]?.id || "");
     const [totalPrice, setTotalPrice] = useState<number>(chefMenus[0]?.basePrice || 0);
     const [orderSummary, setOrderSummary] = useState<string>("");
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+    const [activeVideoIndex, setActiveVideoIndex] = useState<number>(0);
+    const [isPlaying, setIsPlaying] = useState<boolean>(false);
+    const videoRef = useRef<HTMLVideoElement>(null);
+
+    const togglePlay = () => {
+        if (videoRef.current) {
+            if (isPlaying) {
+                videoRef.current.pause();
+            } else {
+                videoRef.current.play();
+            }
+            setIsPlaying(!isPlaying);
+        }
+    };
 
     return (
         <main className="bg-white min-h-screen relative">
@@ -168,24 +183,62 @@ export default function ChefProfile({ chef }: ChefProfileProps) {
                                 </div>
                             </div>
 
-                            <div className="h-full w-full overflow-hidden flex">
-                                {chef.verticalVideos && chef.verticalVideos.length > 0 ? (
+                            <div className="h-full w-full overflow-hidden flex relative">
+                                {verticalVideos.length > 0 ? (
                                     <div className="relative w-full h-full">
                                         <video
-                                            src={chef.verticalVideos[0]}
-                                            autoPlay
-                                            loop
-                                            muted
+                                            key={activeVideoIndex}
+                                            ref={videoRef}
+                                            src={verticalVideos[activeVideoIndex]}
+                                            autoPlay={false}
+                                            muted={false}
                                             playsInline
-                                            className="w-full h-full object-cover"
+                                            onClick={togglePlay}
+                                            onEnded={() => {
+                                                setIsPlaying(false);
+                                                setActiveVideoIndex((prev) => (prev + 1) % verticalVideos.length);
+                                            }}
+                                            className="w-full h-full object-cover cursor-pointer relative z-10"
                                         />
-                                        <div className="absolute bottom-10 left-0 right-0 px-8 z-20">
-                                            <div className="flex gap-1 mb-4">
-                                                {chef.verticalVideos.map((_, i) => (
-                                                    <div key={i} className={`h-1 flex-1 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/30'}`} />
+
+                                        {/* Play Overlay Button */}
+                                        {!isPlaying && (
+                                            <div 
+                                                onClick={togglePlay}
+                                                className="absolute inset-0 flex items-center justify-center bg-black/35 cursor-pointer z-15"
+                                            >
+                                                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/40 hover:scale-110 transition-transform duration-300">
+                                                    <Play size={32} className="fill-white translate-x-0.5" />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Next / Prev Quick Tap Zones */}
+                                        <button
+                                            onClick={() => setActiveVideoIndex((prev) => (prev === 0 ? verticalVideos.length - 1 : prev - 1))}
+                                            className="absolute left-0 top-0 bottom-0 w-1/4 z-20 cursor-w-resize"
+                                            aria-label="Previous video"
+                                        />
+                                        <button
+                                            onClick={() => setActiveVideoIndex((prev) => (prev + 1) % verticalVideos.length)}
+                                            className="absolute right-0 top-0 bottom-0 w-1/4 z-20 cursor-e-resize"
+                                            aria-label="Next video"
+                                        />
+
+                                        <div className="absolute bottom-10 left-0 right-0 px-8 z-25 pointer-events-auto">
+                                            <div className="flex gap-1.5 mb-4 relative z-30">
+                                                {verticalVideos.map((_, i) => (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => setActiveVideoIndex(i)}
+                                                        className={`h-1.5 flex-1 rounded-full transition-all duration-300 ${i === activeVideoIndex ? 'bg-white scale-y-110 shadow' : 'bg-white/30 hover:bg-white/50'}`}
+                                                        aria-label={`Go to video ${i + 1}`}
+                                                    />
                                                 ))}
                                             </div>
-                                            <p className="text-white text-sm font-medium">Watch {chef.name} prepare his signature Lebanese fusion dishes...</p>
+                                            <p className="text-white text-sm font-medium relative z-30 drop-shadow-md">
+                                                Watch {chef.name} prepare signature Lebanese dishes...
+                                            </p>
                                         </div>
                                     </div>
                                 ) : (

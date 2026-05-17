@@ -6,9 +6,9 @@ import { useState, useEffect } from "react";
 
 const HERO_IMAGES = [
     "/images/hero-bg.jpg",
-    "/images/Hero images/c0957052-7adc-456c-a804-d00325e75ac0 (1).png",
-    "/images/Hero images/hero-chef.png",
-    "/images/Hero images/menu-south-indian.png"
+    "/images/dishes/makloubeh_aubergine.jpg",
+    "/images/dishes/lebanese_rice_meat_nuts.jpg",
+    "/images/dishes/chicken_rice_platter.jpg"
 ];
 
 export default function Hero() {
@@ -89,9 +89,9 @@ export default function Hero() {
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     className="text-5xl md:text-7xl font-heading font-bold leading-tight mb-6 drop-shadow-lg"
                 >
-                    Savor the <span className="text-orange italic font-serif">Magic</span>
+                    Private Chef
                     <br />
-                    of Christmas
+                    <span className="text-orange italic font-serif">Experience</span>
                 </motion.h1>
 
                 <motion.p

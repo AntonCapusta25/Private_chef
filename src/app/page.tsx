@@ -8,7 +8,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import HowItWorks from "@/components/HowItWorks";
 
-
 export default function Home() {
   return (
     <main className="relative min-h-screen bg-cream">

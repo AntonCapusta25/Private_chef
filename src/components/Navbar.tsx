@@ -3,10 +3,13 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [bookingLink, setBookingLink] = useState("#booking");
+    const pathname = usePathname();
+    const isChefProfile = pathname && pathname.startsWith("/chef/");
 
     useEffect(() => {
         const handleScroll = () => {
@@ -36,6 +39,8 @@ export default function Navbar() {
         };
     }, []);
 
+    const logoHref = isChefProfile ? pathname : "/";
+
     return (
         <motion.nav
             initial={{ y: -100, opacity: 0 }}
@@ -46,7 +51,7 @@ export default function Navbar() {
                 : "bg-white/90 backdrop-blur-sm shadow-sm"
                 }`}
         >
-            <Link href="/" className="flex items-center gap-2">
+            <Link href={logoHref} className="flex items-center gap-2">
                 {/* Logo */}
                 <div className="h-9 w-auto">
                     <img
@@ -57,17 +62,28 @@ export default function Navbar() {
                 </div>
             </Link>
 
-            <div className="hidden md:flex items-center gap-8 text-light font-medium text-sm tracking-wide">
-                <Link href="#how-it-works" className="hover:text-orange transition-colors">
-                    How it Works
-                </Link>
-                <Link href="#menu-boxes" className="hover:text-orange transition-colors">
-                    Menus
-                </Link>
-                <Link href="#occasions" className="hover:text-orange transition-colors">
-                    Occasions
-                </Link>
-            </div>
+            {isChefProfile ? (
+                <div className="hidden md:flex items-center gap-8 text-light font-medium text-sm tracking-wide">
+                    <Link href="#menu-selection" className="hover:text-orange transition-colors">
+                        Menu Selection
+                    </Link>
+                    <Link href="#booking" className="hover:text-orange transition-colors">
+                        Reserve Table
+                    </Link>
+                </div>
+            ) : (
+                <div className="hidden md:flex items-center gap-8 text-light font-medium text-sm tracking-wide">
+                    <Link href="#how-it-works" className="hover:text-orange transition-colors">
+                        How it Works
+                    </Link>
+                    <Link href="#menu-boxes" className="hover:text-orange transition-colors">
+                        Menus
+                    </Link>
+                    <Link href="#occasions" className="hover:text-orange transition-colors">
+                        Occasions
+                    </Link>
+                </div>
+            )}
 
             <Link
                 href={bookingLink}

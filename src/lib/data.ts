@@ -849,9 +849,9 @@ export const chefs: Chef[] = [
         experience: "20+ Years",
         languages: ["Dutch", "English", "Arabic"],
         verticalVideos: [
-            "https://assets.mixkit.co/videos/preview/mixkit-chef-preparing-a-salad-with-fresh-ingredients-41130-large.mp4",
-            "https://assets.mixkit.co/videos/preview/mixkit-chef-cutting-vegetables-on-a-wooden-board-41131-large.mp4",
-            "https://assets.mixkit.co/videos/preview/mixkit-chef-preparing-a-dish-in-a-professional-kitchen-41132-large.mp4"
+            "/videos/story1.mp4",
+            "/videos/story2.mp4",
+            "/videos/story3.mp4"
         ]
     },
     {

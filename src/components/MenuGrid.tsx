@@ -54,7 +54,7 @@ export default function MenuGrid() {
                 }}
                 className="w-full !pb-12 !pl-5 md:!pl-[max(8vw,2rem)] xl:!pl-[max(15vw,2rem)]"
             >
-                {menus.map((menu, index) => (
+                {menus.filter(menu => menu.chef === "Heaven's Kitchen").map((menu, index) => (
                     <SwiperSlide key={menu.id}>
                         <Link href={`/menus/${menu.id}`} className="block h-full">
                             <MenuCard menu={menu} index={index} />
